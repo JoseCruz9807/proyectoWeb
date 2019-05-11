@@ -1,26 +1,22 @@
 {
-  "name": "proyectoWeb",
+  "name": "mongo",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "mongo.js",
   "scripts": {
-    "start": "node app.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/JoseCruz9807/proyectoWeb.git"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/JoseCruz9807/proyectoWeb/issues"
-  },
-  "homepage": "https://github.com/JoseCruz9807/proyectoWeb#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
     "express": "^4.16.4",
-    "mongodb": "^3.2.3",
-    "path": "^0.12.7",
-    "request": "^2.88.0"
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.2.2",
+    "mongoose": "^5.5.1",
+    "validator": "^10.11.0"
   }
 }

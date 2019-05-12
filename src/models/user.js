@@ -46,7 +46,12 @@ const userSchema = new mongoose.Schema({
       type: String,
       required: true
     }
-  }]
+  }],
+  typee:{
+    type:String,
+    required: true,
+    default:"userOnly"
+  }
 },{
   toObject: {
     virtuals: true
@@ -57,8 +62,9 @@ const userSchema = new mongoose.Schema({
 })
 
 // una relacion entre dos Schemas, no lo guarda, es virtual 
-userSchema.virtual('todos', {
-  ref: 'Todo',
+
+userSchema.virtual('comments', {
+  ref: 'Comment',
   localField: '_id',
   foreignField: 'createdBy'
 })

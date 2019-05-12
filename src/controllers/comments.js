@@ -1,14 +1,14 @@
-const Todo = require('../models/todo')
+const Todo = require('../models/comment')
 
-const getTodos = function(req, res) {
+const getComments = function(req, res) {
   // solo podemos hacer GET de los todos del usuario que hizo login
-  Todo.find({ createdBy: req.user._id}).then(function(todos) {
-    res.send(todos)
+  Todo.find({ belongsTo: req.product._id}).then(function(comments) {
+    res.send(comments)
   }).catch(function(error){
     res.status(500).send(error)
   })
 }
-
+/*
 const getTodo = function(req, res) {
   // solo podemos traer el todo si es que es del usuario que hizo login
   const _id = req.params.id
@@ -21,22 +21,24 @@ const getTodo = function(req, res) {
     return res.status(500).send({ error: error })
   })
 }
-
-const createTodo = function(req, res){
+*/
+const createComment = function(req, res){
   // los ... son para copiar todo el req.body
-  const todo = new Todo({
+  const comment = new Todo({
     description: req.body.description,
-    completed: false,
-    createdBy: req.user._id
+    author: req.body.author,
+    rating: req.body.rating,
+    createdBy: req.user._id,
+    belongsTo:req.product._id
   })
-  todo.save().then(function() {
-    return res.send(todo)
+  comment.save().then(function() {
+    return res.send(comment)
   }).catch(function(error) {
     return res.status(400).send({ error: error })
   })
 }
-
-const updateTodo = function(req, res) {
+/*
+const updateComment = function(req, res) {
   const _id = req.params.id
   const updates = Object.keys(req.body)
   const allowedUpdates = ['description', 'completed']
@@ -48,14 +50,15 @@ const updateTodo = function(req, res) {
       error: 'Invalid update, only allowed to update: ' + allowedUpdates
     })
   }
+
   // ya no solo buscamos por id, si no también deberia de ser de el owner
   // del todo por lo tanto usamos findOneAndUpdate para pasarle mas datos
   // Todo.findByIdAndUpdate(_id, req.body ).then(function(todo) {
-  Todo.findOneAndUpdate({ _id, createdBy: req.user._id }, req.body ).then(function(todo) {
-    if (!todo) {
+  Comment.findOneAndUpdate({ _id, createdBy: req.user._id, belongsTo: req.product._id }, req.body ).then(function(comment) {
+    if (!comment) {
       return res.status(404).send({ error: `Task with id ${_id} not found.`})
     }
-    return res.send(todo)
+    return res.send(comment)
   }).catch(function(error) {
     res.status(500).send({ error: error })
   })
@@ -72,11 +75,11 @@ const deleteTodo = function(req, res) {
     res.status(505).send({ error: error })
   })
 }
-
+*/
 module.exports = {
-  getTodos : getTodos,
-  getTodo: getTodo,
-  createTodo : createTodo,
-  updateTodo : updateTodo,
-  deleteTodo : deleteTodo
+  getComments : getComments,
+  //getTodo: getTodo,
+  createComment : createComment,
+  //updateTodo : updateTodo,
+  //deleteTodo : deleteTodo
 }

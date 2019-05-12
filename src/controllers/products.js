@@ -1,15 +1,15 @@
-const User = require('../models/user')
+const Product = require('../models/product')
 
 // ya no debería tener esta ruta a menos que sea un usuario tipo admin
-const getUsers = function(req, res) {
-  User.find({}).then(function(users) {
-    res.send(users)
+const getProducts = function(req, res) {
+  Product.find({}).then(function(products) {
+    res.send(products)
   }).catch(function(error){
     res.status(500).send(error)
   })
 }
 
-const getUser = function(req, res) {
+const getProduct = function(req, res) {
   // cualquier usuario no deberia ser capaz de ver la info de un usuario
   // a menos que sea un admin. Aqui yo ya no admitire que me pasen el :id 
   // solo usare el id de la request-> req.user._id
@@ -23,28 +23,44 @@ const getUser = function(req, res) {
   //   if(!user){
   //     return res.status(404).send()
   //   }
-  User.findById( req.user._id ).populate('comments').exec(function(error, user) {
+  Product.findById( req.product._id ).populate('comments').exec(function(error, product) {
   // req.user.populate('todos').exec(function(error, user) {  
     // user ya tiene la info de req.user y req.user.todos
-    return res.send(user)
+    return res.send(product)
   })
   // }).catch(function(error) {
   //   return res.status(500).send(error)
 }
 
-const createUser = function(req, res){
-  const user = new User(req.body)
-  user.save().then(function() {
-    return res.send(user)
+const createProduct = function(req, res){
+    if(req.user.typee=='userOnly'){
+        return res.status(401).send({ error: 'Authenticate plox'})
+    }
+  const product = new Product({
+    name: req.body.name,
+    brand: req.body.brand,
+    typee:req.body.typee,
+    skin_type:req.body.skin_type,
+    ingredients:req.body.ingredients,
+    anti_aging:req.body.anti_aging,
+    hypoallergenic:req.body.hypoallergenic,
+    paraben_free:req.body.paraben_free,
+    perfume:req.body.perfume,
+    content:req.body.content,
+    price:req.body.price,
+    image:req.body.image
+  })
+  product.save().then(function() {
+    return res.send(product)
   }).catch(function(error) {
     return res.status(400).send(error)
   })
 }
 
-const login = function(req, res) {
-  User.findByCredentials(req.body.email, req.body.password).then(function(user){
-    user.generateToken().then(function(token){
-      return res.send({user, token})
+const goIn = function(req, res) {
+  Product.findByCredentials(req.body.name).then(function(product){
+    product.generateToken().then(function(token){
+      return res.send({product, token})
     }).catch(function(error){
       return res.status(401).send({ error: error })
     })
@@ -53,25 +69,14 @@ const login = function(req, res) {
   })
 }
 
-const logout = function(req, res) {
-  req.user.tokens = req.user.tokens.filter(function(token) {
-    return token.token !== req.token
-  })
-  req.user.save().then(function() {
-    return res.send()
-  }).catch(function(error) {
-    return res.status(500).send({ error: error } )
-  })
-}
 
-
-const updateUser = function(req, res) {
+const updateProduct = function(req, res) {
   // solo admitire hacer update de mi usuario que hizo login
   // quitare la ruta de PATCH users/:id y la cambiare solo por PATCH /users
   // const _id = req.params.id
-  const _id = req.user._id
+  const _id = req.product._id
   const updates = Object.keys(req.body)
-  const allowedUpdates = ['name', 'age', 'password', 'email']
+  const allowedUpdates = ['image', 'typee', 'ingredients','skin_type','anti_aging','hypoallergenic','paraben_free','perfume','price','content']
   // revisa que los updates enviados sean permitidos, que no envie una key que no permitimos
   const isValidUpdate = updates.every((update) => allowedUpdates.includes(update))
 
@@ -80,11 +85,11 @@ const updateUser = function(req, res) {
       error: 'Invalid update, only allowed to update: ' + allowedUpdates
     })
   }
-  User.findByIdAndUpdate(_id, req.body ).then(function(user) {
-    if (!user) {
+  Product.findByIdAndUpdate(_id, req.body ).then(function(product) {
+    if (!product) {
       return res.status(404).send()
     }
-    return res.send(user)
+    return res.send(product)
   }).catch(function(error) {
     res.status(500).send(error)
   })
@@ -93,11 +98,11 @@ const updateUser = function(req, res) {
 // este solo lo utilizarían si quisieran eliminar una cuenta, cancelar subscripcion, etc
 // y de igual forma, solo podrían deberían borrar el usuario en el que hicieron login
 // por lo tanto, no se le pasa un id, usan el de el token
-const deleteUser = function(req, res) {
+const deleteProduct = function(req, res) {
   // const _id = req.params.id
-  const _id = req.user._id
-  User.findByIdAndDelete(_id).then(function(user){
-    if(!user) {
+  const _id = req.product._id
+  Product.findByIdAndDelete(_id).then(function(product){
+    if(!product) {
       return res.status(404).send()
     }
     return res.send(user)
@@ -107,11 +112,11 @@ const deleteUser = function(req, res) {
 }
 
 module.exports = {
-  getUsers : getUsers,
-  getUser: getUser,
-  login: login,
-  logout: logout,
-  createUser : createUser,
-  updateUser : updateUser,
-  deleteUser : deleteUser
+  getProducts : getProducts,
+  getProduct: getProduct,
+  goIn: goIn,
+  //logout: logout,
+  createProduct : createProduct,
+  updateProduct : updateProduct,
+  deleteProduct : deleteProduct
 }

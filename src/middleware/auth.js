@@ -64,6 +64,5 @@ const auth2 = function( req, res, next ) {
     res.status(401).send({ error: 'Authenticate plz'})
   }
 }
-
-module.exports = auth
-module.exports=auth2
+module.exports = {auth:auth,
+auth2:auth2}

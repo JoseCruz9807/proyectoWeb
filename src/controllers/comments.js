@@ -1,8 +1,9 @@
-const Todo = require('../models/comment')
-
+const Comment = require('../models/comment')
+const mongodb = require ('mongodb')
+const ObjectID = mongodb.ObjectID
 const getComments = function(req, res) {
   // solo podemos hacer GET de los todos del usuario que hizo login
-  Todo.find({ belongsTo: req.product._id}).then(function(comments) {
+  Comment.find({ belongsTo: req.params._id}).then(function(comments) {
     res.send(comments)
   }).catch(function(error){
     res.status(500).send(error)
@@ -24,12 +25,13 @@ const getTodo = function(req, res) {
 */
 const createComment = function(req, res){
   // los ... son para copiar todo el req.body
-  const comment = new Todo({
+  id=new ObjectID(req.params._id)
+  const comment = new Comment({
     description: req.body.description,
     author: req.body.author,
     rating: req.body.rating,
     createdBy: req.user._id,
-    belongsTo:req.product._id
+    belongsTo:id
   })
   comment.save().then(function() {
     return res.send(comment)

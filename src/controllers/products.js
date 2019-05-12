@@ -1,5 +1,6 @@
 const Product = require('../models/product')
-
+const mongodb = require ('mongodb')
+const ObjectID = mongodb.ObjectID
 // ya no debería tener esta ruta a menos que sea un usuario tipo admin
 const getProducts = function(req, res) {
   Product.find({}).then(function(products) {
@@ -23,18 +24,25 @@ const getProduct = function(req, res) {
   //   if(!user){
   //     return res.status(404).send()
   //   }
-  Product.findById( req.product._id ).populate('comments').exec(function(error, product) {
+  id=new ObjectID(req.params.id)
+  //console.log(id)
+  Product.findById( id ).populate('comments').exec(function(error, product) {
   // req.user.populate('todos').exec(function(error, user) {  
     // user ya tiene la info de req.user y req.user.todos
-    return res.send(product)
-  })
-  // }).catch(function(error) {
-  //   return res.status(500).send(error)
+    if (!error){
+        console.log(error)
+        return res.status(500).send(error)
+    }
+    else{return res.send(product) }
+  })//.catch(function(error) {
+   // return res.status(500).send({error:"FAILURE"})
+ // })
+   //return res.status(500).send({error:"FAILURE"})
 }
 
 const createProduct = function(req, res){
     if(req.user.typee=='userOnly'){
-        return res.status(401).send({ error: 'Authenticate plox'})
+        return res.status(401).send({ error: 'Admins Only'})
     }
   const product = new Product({
     name: req.body.name,
@@ -51,12 +59,12 @@ const createProduct = function(req, res){
     image:req.body.image
   })
   product.save().then(function() {
-    return res.send(product)
+    return res.status(200).send(product)
   }).catch(function(error) {
-    return res.status(400).send(error)
+    return res.status(450).send(error)
   })
 }
-
+/*
 const goIn = function(req, res) {
   Product.findByCredentials(req.body.name).then(function(product){
     product.generateToken().then(function(token){
@@ -67,14 +75,17 @@ const goIn = function(req, res) {
   }).catch(function(error) {
     return res.status(401).send({ error: error })
   })
-}
+}*/
 
 
 const updateProduct = function(req, res) {
   // solo admitire hacer update de mi usuario que hizo login
   // quitare la ruta de PATCH users/:id y la cambiare solo por PATCH /users
   // const _id = req.params.id
-  const _id = req.product._id
+  if(req.user.typee=='userOnly'){
+    return res.status(401).send({ error: 'Admins Only'})
+    }
+  const _id = req.params._id
   const updates = Object.keys(req.body)
   const allowedUpdates = ['image', 'typee', 'ingredients','skin_type','anti_aging','hypoallergenic','paraben_free','perfume','price','content']
   // revisa que los updates enviados sean permitidos, que no envie una key que no permitimos
@@ -85,7 +96,7 @@ const updateProduct = function(req, res) {
       error: 'Invalid update, only allowed to update: ' + allowedUpdates
     })
   }
-  Product.findByIdAndUpdate(_id, req.body ).then(function(product) {
+  Product.findOneAndUpdate(_id, req.body ).then(function(product) {
     if (!product) {
       return res.status(404).send()
     }
@@ -100,8 +111,11 @@ const updateProduct = function(req, res) {
 // por lo tanto, no se le pasa un id, usan el de el token
 const deleteProduct = function(req, res) {
   // const _id = req.params.id
+  if(req.user.typee=='userOnly'){
+    return res.status(401).send({ error: 'Admins Only'})
+    }
   const _id = req.product._id
-  Product.findByIdAndDelete(_id).then(function(product){
+  Product.findOneAndDelete(_id).then(function(product){
     if(!product) {
       return res.status(404).send()
     }
@@ -114,7 +128,7 @@ const deleteProduct = function(req, res) {
 module.exports = {
   getProducts : getProducts,
   getProduct: getProduct,
-  goIn: goIn,
+  //goIn: goIn,
   //logout: logout,
   createProduct : createProduct,
   updateProduct : updateProduct,

@@ -77,16 +77,16 @@ productSchema.virtual('comments', {
   localField: '_id',
   foreignField: 'belongsTo'
 })
-
+/*
 productSchema.methods.toJSON = function() {
   const product = this
-  const productObject = user.toObject()
+  const productObject = product.toObject()
 
   //delete product.password
-  delete productObject.tokens
+  //delete productObject.tokens
 
   return productObject
-}
+}*/
 
 
 productSchema.statics.findByCredentials = function(productName) {

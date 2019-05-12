@@ -1,6 +1,4 @@
 const Product = require('../models/product')
-const mongodb = require ('mongodb')
-const ObjectID = mongodb.ObjectID
 // ya no debería tener esta ruta a menos que sea un usuario tipo admin
 const getProducts = function(req, res) {
   Product.find({}).then(function(products) {
@@ -24,12 +22,11 @@ const getProduct = function(req, res) {
   //   if(!user){
   //     return res.status(404).send()
   //   }
-  id=new ObjectID(req.params.id)
   //console.log(id)
-  Product.findById( id ).populate('comments').exec(function(error, product) {
+  Product.findById( req.params.id ).populate('comments').exec(function(error, product) {
   // req.user.populate('todos').exec(function(error, user) {  
     // user ya tiene la info de req.user y req.user.todos
-    if (!error){
+    if (error){
         console.log(error)
         return res.status(500).send(error)
     }

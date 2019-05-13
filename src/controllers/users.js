@@ -1,5 +1,5 @@
 const User = require('../models/user')
-
+const bcrypt = require('bcryptjs')
 // ya no debería tener esta ruta a menos que sea un usuario tipo admin
 const getUsers = function(req, res) {
   User.find({}).then(function(users) {
@@ -101,7 +101,7 @@ const updateUser = function(req, res) {
       })
 
     }).catch(function(error){
-      return next(error)
+      return res.status(500).send(error)
     })
   }
   else{

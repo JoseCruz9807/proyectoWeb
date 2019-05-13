@@ -1,4 +1,14 @@
 const Comment = require('../models/comment')
+const Product = require('../models/product')
+var jsdom = require('jsdom');
+const { JSDOM } = jsdom;
+const { window } = new JSDOM();
+const { document } = (new JSDOM('')).window;
+global.document = document;
+
+var $ = jQuery = require('jquery')(window);
+
+
 const getComments = function(req, res) {
   // solo podemos hacer GET de los todos del usuario que hizo login
   Comment.find({ belongsTo: req.params._id}).then(function(comments) {
@@ -23,17 +33,79 @@ const getTodo = function(req, res) {
 */
 const createComment = function(req, res){
   // los ... son para copiar todo el req.body
-  const comment = new Comment({
-    description: req.body.description,
-    author: req.body.author,
-    rating: req.body.rating,
-    createdBy: req.user._id,
-    belongsTo:req.params.id
-  })
-  comment.save().then(function() {
-    return res.send(comment)
-  }).catch(function(error) {
-    return res.status(400).send({ error: error })
+  var comentariosProducto
+  var newAverage=0
+  var respuesta=0
+  Product.findById( req.params.id ).populate('comments').exec(function(error, product) {
+    // req.user.populate('todos').exec(function(error, user) {  
+      // user ya tiene la info de req.user y req.user.todos
+      if (error){
+          console.log(error)
+          return res.status(500).send(error)
+      }
+      else{
+        comentariosProducto=product.comments
+        newAverage=0
+        newAverageSentiment=0
+        for (i=0; i<comentariosProducto.length-1; i++){
+          newAverage+=comentariosProducto[i].rating
+          newAverageSentiment+=comentariosProducto[i].sentiment
+          console.log(i)
+        }
+        newAverage=parseFloat(req.body.rating)+newAverage
+        newAverage=newAverage/(comentariosProducto.length)
+        text=req.body.description
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://language.googleapis.com/v1beta2/documents:analyzeSentiment?key=AIzaSyA3Z6xC4-LbodTSjUGBk_VRO_uuinE69KI",
+            "method": "POST",
+            "headers": {
+              "Content-Type": "application/json",
+              "Accept": "*/*",
+              "Cache-Control": "no-cache",
+              "Host": "language.googleapis.com",
+              "accept-encoding": "gzip, deflate",
+              "content-length": "171",
+              "Connection": "keep-alive",
+              "cache-control": "no-cache"
+            },
+            "processData": false,
+            "data": "{\n  \"document\": {\n \"type\": \"PLAIN_TEXT\",\n   \"content\": \""+text+"\"\n                   } ,\n  \"encodingType\": \"UTF16\"\n}"
+          }
+          //console.log(settings)
+          $.ajax(settings).done(function (response) {
+            //console.log(response);
+            respuesta=response.documentSentiment.score*response.documentSentiment.magnitude+1
+            newAverageSentiment=newAverageSentiment+((respuesta/2)*10)
+            newAverageSentiment=newAverageSentiment/(comentariosProducto.length)
+            Product.findOneAndUpdate(req.params.id, {totalRate:newAverage,generalSentiment:newAverageSentiment} ).then(function(product) {
+              if (!product) {
+                return res.status(404).send()
+              }
+            })
+
+
+
+            const comment = new Comment({
+              description: req.body.description,
+              author: req.body.author,
+              rating: req.body.rating,
+              createdBy: req.user._id,
+              belongsTo:req.params.id,
+              sentiment:((respuesta/2)*10)
+            })
+            comment.save().then(function() {
+              return res.send(comment)
+            }).catch(function(error) {
+              return res.status(400).send({ error: error })
+            })
+
+
+          }).fail(function(error){
+            return res.status(400).send({ error: error })
+          })
+      }
   })
 }
 /*
@@ -62,23 +134,26 @@ const updateComment = function(req, res) {
     res.status(500).send({ error: error })
   })
 }
-
-const deleteTodo = function(req, res) {
+*/
+const deleteComment = function(req, res) {
+  if(req.user.typee=='userOnly'){
+    return res.status(401).send({ error: 'Admins Only'})
+    }
   const _id = req.params.id
-  Todo.findOneAndDelete({ _id, createdBy: req.user._id }).then(function(todo){
-    if(!todo) {
+  Comment.findOneAndDelete({ _id }).then(function(comment){
+    if(!comment) {
       return res.status(404).send({ error: `Task with id ${_id} not found.`})
     }
-    return res.send(todo)
+    return res.send(comment)
   }).catch(function(error) {
     res.status(505).send({ error: error })
   })
 }
-*/
+
 module.exports = {
   getComments : getComments,
   //getTodo: getTodo,
   createComment : createComment,
   //updateTodo : updateTodo,
-  //deleteTodo : deleteTodo
+  deleteComment : deleteComment
 }

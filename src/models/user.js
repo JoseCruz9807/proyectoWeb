@@ -50,7 +50,12 @@ const userSchema = new mongoose.Schema({
   typee:{
     type:String,
     required: true,
-    default:"userOnly"
+    default:"userOnly",
+    validate(value) {
+      if ( value!="userOnly"|| value!="admin") {
+        throw new Error('Rol inválido')
+      }
+    }
   }
 },{
   toObject: {

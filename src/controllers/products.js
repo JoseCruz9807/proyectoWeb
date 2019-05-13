@@ -53,7 +53,8 @@ const createProduct = function(req, res){
     perfume:req.body.perfume,
     content:req.body.content,
     price:req.body.price,
-    image:req.body.image
+    image:req.body.image,
+    totalRate:0
   })
   product.save().then(function() {
     return res.status(200).send(product)

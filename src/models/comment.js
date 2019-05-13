@@ -21,6 +21,10 @@ const commentSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  sentiment:{
+    type: Number,
+    required: true
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

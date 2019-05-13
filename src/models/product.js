@@ -62,6 +62,16 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    totalRate:{
+      type:Number,
+      required: true,
+      default: 0
+    },
+    generalSentiment:{
+      type: Number,
+      required: true,
+      default: 0
+    }
 },{
   toObject: {
     virtuals: true

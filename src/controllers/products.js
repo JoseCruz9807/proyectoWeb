@@ -76,7 +76,7 @@ const deleteProduct = function(req, res) {
   if(req.user.typee=='userOnly'){
     return res.status(401).send({ error: 'Admins Only'})
     }
-  const _id = req.product._id
+  const _id = req.params.id
   Product.findOneAndDelete(_id).then(function(product){
     if(!product) {
       return res.status(404).send()

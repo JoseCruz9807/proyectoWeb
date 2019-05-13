@@ -50,7 +50,7 @@ const updateProduct = function(req, res) {
   if(req.user.typee=='userOnly'){
     return res.status(401).send({ error: 'Admins Only'})
     }
-  const _id = req.params._id
+  const _id = req.params.id
   const updates = Object.keys(req.body)
   const allowedUpdates = ['image', 'typee', 'ingredients','skin_type','anti_aging','hypoallergenic','paraben_free','perfume','price','content']
   const isValidUpdate = updates.every((update) => allowedUpdates.includes(update))

@@ -14,3 +14,4 @@ mongoose.connect( connectionURL, {
   useNewUrlParser: true,
   useCreateIndex: true
 })
+mongoose.set("useFindAndModify", false);

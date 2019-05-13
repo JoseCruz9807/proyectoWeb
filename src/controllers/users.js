@@ -78,22 +78,47 @@ const updateUser = function(req, res) {
   const _id = req.user._id
   const updates = Object.keys(req.body)
   const allowedUpdates = ['name', 'age', 'password', 'email']
+  const passKey=['password']
   // revisa que los updates enviados sean permitidos, que no envie una key que no permitimos
   const isValidUpdate = updates.every((update) => allowedUpdates.includes(update))
+  const hasPassword=updates.every((update) => passKey.includes(update))
+  if(hasPassword){
+    bcrypt.hash(req.body.password, 8).then(function(hash){
+      req.body.password = hash
 
-  if( !isValidUpdate ) {
-    return res.status(400).send({
-      error: 'Invalid update, only allowed to update: ' + allowedUpdates
+      if( !isValidUpdate ) {
+        return res.status(400).send({
+          error: 'Invalid update, only allowed to update: ' + allowedUpdates
+        })
+      }
+      User.findByIdAndUpdate(_id, req.body ).then(function(user) {
+        if (!user) {
+          return res.status(404).send()
+        }
+        return res.send(user)
+      }).catch(function(error) {
+        res.status(500).send(error)
+      })
+
+    }).catch(function(error){
+      return next(error)
     })
   }
-  User.findByIdAndUpdate(_id, req.body ).then(function(user) {
-    if (!user) {
-      return res.status(404).send()
+  else{
+    if( !isValidUpdate ) {
+      return res.status(400).send({
+        error: 'Invalid update, only allowed to update: ' + allowedUpdates
+      })
     }
-    return res.send(user)
-  }).catch(function(error) {
-    res.status(500).send(error)
-  })
+    User.findByIdAndUpdate(_id, req.body ).then(function(user) {
+      if (!user) {
+        return res.status(404).send()
+      }
+      return res.send(user)
+    }).catch(function(error) {
+      res.status(500).send(error)
+    })
+  }
 }
 
 // este solo lo utilizarían si quisieran eliminar una cuenta, cancelar subscripcion, etc

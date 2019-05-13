@@ -52,7 +52,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     default:"userOnly",
     validate(value) {
-      if ( validator.equals(value,"userOnly")|| validator.equals(value,"admin")) {
+      if ( !validator.equals(value,"userOnly")&& !validator.equals(value,"admin")) {
         throw new Error('Rol inválido')
       }
     }

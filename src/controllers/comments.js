@@ -107,7 +107,7 @@ const deleteComment = function(req, res) {
     return res.status(401).send({ error: 'Admins Only'})
     }
   const _id = req.params.id
-  Comment.findOneAndDelete({ _id }).then(function(comment){
+  Comment.findByIdAndDelete({ _id }).then(function(comment){
     if(!comment) {
       return res.status(404).send({ error: `Task with id ${_id} not found.`})
     }

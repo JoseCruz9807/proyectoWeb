@@ -77,11 +77,11 @@ const deleteProduct = function(req, res) {
     return res.status(401).send({ error: 'Admins Only'})
     }
   const _id = req.params.id
-  Product.findOneAndDelete(_id).then(function(product){
+  Product.findByIdAndDelete(_id).then(function(product){
     if(!product) {
       return res.status(404).send()
     }
-    return res.send(user)
+    return res.send(product)
   }).catch(function(error) {
     res.status(505).send(error)
   })

@@ -38,7 +38,7 @@ const createUser = function(req, res){
     email: req.body.email,
     age: req.body.age,
     password: req.body.password,
-    type:"userOnly"
+    typee:"userOnly"
   })
   user.save().then(function() {
     return res.send(user)

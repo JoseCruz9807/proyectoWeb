@@ -46,7 +46,7 @@ const createComment = function(req, res){
           console.log(i)
         }
         newAverage=parseFloat(req.body.rating)+newAverage
-        newAverage=newAverage/(comentariosProducto.length)
+        if(comentariosProducto.length>0){newAverage=newAverage/(comentariosProducto.length)}
         text=req.body.description
         var settings = {
             "async": true,
@@ -71,7 +71,7 @@ const createComment = function(req, res){
             
             respuesta=response.documentSentiment.score*response.documentSentiment.magnitude+1
             newAverageSentiment=newAverageSentiment+((respuesta/2)*10)
-            newAverageSentiment=newAverageSentiment/(comentariosProducto.length)
+            if(comentariosProducto.length>0){newAverageSentiment=newAverageSentiment/(comentariosProducto.length)}
             Product.findOneAndUpdate(req.params.id, {totalRate:newAverage,generalSentiment:newAverageSentiment} ).then(function(product) {
               if (!product) {
                 return res.status(404).send()

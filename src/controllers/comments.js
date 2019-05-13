@@ -8,6 +8,14 @@ global.document = document;
 
 var $ = jQuery = require('jquery')(window);
 
+if(process.env.NODE_ENV==='production'){
+  var apiKey = process.env.apiKey
+}
+else{
+  const credentials = require('../config.js')
+  var apiKey = credentials.apiKey
+}
+
 
 const getComments = function(req, res) {
   // solo podemos hacer GET de los todos del usuario que hizo login
@@ -58,7 +66,7 @@ const createComment = function(req, res){
         var settings = {
             "async": true,
             "crossDomain": true,
-            "url": "https://language.googleapis.com/v1beta2/documents:analyzeSentiment?key=AIzaSyA3Z6xC4-LbodTSjUGBk_VRO_uuinE69KI",
+            "url": "https://language.googleapis.com/v1beta2/documents:analyzeSentiment?key="+apiKey,
             "method": "POST",
             "headers": {
               "Content-Type": "application/json",

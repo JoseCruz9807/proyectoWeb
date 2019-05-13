@@ -128,7 +128,7 @@ userSchema.pre('save', function(next) {
     })
   } else {
     bcrypt.hash(user.password, 8).then(function(hash){
-      user.password = hash
+      user.password = user.password
       next()
     }).catch(function(error){
       return next(error)

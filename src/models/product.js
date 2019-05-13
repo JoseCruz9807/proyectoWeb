@@ -81,22 +81,12 @@ const productSchema = new mongoose.Schema({
   }
 })
 
-// una relacion entre dos Schemas, no lo guarda, es virtual 
+
 productSchema.virtual('comments', {
   ref: 'Comment',
   localField: '_id',
   foreignField: 'belongsTo'
 })
-/*
-productSchema.methods.toJSON = function() {
-  const product = this
-  const productObject = product.toObject()
-
-  //delete product.password
-  //delete productObject.tokens
-
-  return productObject
-}*/
 
 
 productSchema.statics.findByCredentials = function(productName) {
@@ -108,20 +98,7 @@ productSchema.statics.findByCredentials = function(productName) {
       })
   })
 }
-/*
-productSchema.methods.generateToken = function() {
-  const user = this
-  const token = jwt.sign({ _id: user._id.toString() }, sec, { expiresIn: '7 days'})
-  user.tokens = user.tokens.concat({ token })
-  return new Promise(function( resolve, reject) {
-    user.save().then(function(user){
-      return resolve(token)
-    }).catch(function(error) {
-      return reject(error)
-    })
-  })
-}
-*/
+
 productSchema.pre('save', function(next) {
   const product = this
     next()  

@@ -12,7 +12,7 @@ router.post('/users/login', users.login)
 router.post('/users/logout', auth.auth, users.logout)
 router.post('/users', users.createUser)  // signup
 router.patch('/users', auth.auth, users.updateUser)
-//router.delete('/users', auth.auth, users.deleteUser)
+
 
 router.get('/products/:id', auth.auth, products.getProduct)
 router.get('/products', auth.auth, products.getProducts)

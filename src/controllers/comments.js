@@ -43,11 +43,12 @@ const createComment = function(req, res){
         for (i=0; i<comentariosProducto.length-1; i++){
           newAverage+=comentariosProducto[i].rating
           newAverageSentiment+=comentariosProducto[i].sentiment
-          console.log(i)
+          //console.log(i)
         }
         newAverage=parseFloat(req.body.rating)+newAverage
-        if(comentariosProducto.length>0){newAverage=newAverage/(comentariosProducto.length)}
-        else{newAverage=parseFloat(req.body.rating)}
+        //if(comentariosProducto.length>0){
+          newAverage=newAverage/(comentariosProducto.length)//}
+        //else{newAverage=parseFloat(req.body.rating)}
         text=req.body.description
         var settings = {
             "async": true,
@@ -72,11 +73,12 @@ const createComment = function(req, res){
             
             respuesta=response.documentSentiment.score*response.documentSentiment.magnitude+1
             newAverageSentiment=newAverageSentiment+((respuesta/2)*10)
-            if(comentariosProducto.length>0){newAverageSentiment=newAverageSentiment/(comentariosProducto.length)}
-            else{
+            //if(comentariosProducto.length>0){
+              newAverageSentiment=newAverageSentiment/(comentariosProducto.length)//}
+           /* else{
               newAverageSentiment=((respuesta/2)*10)
-            }
-            Product.findOneAndUpdate(req.params.id, {totalRate:newAverage,generalSentiment:newAverageSentiment} ).then(function(product) {
+            }*/
+            Product.findByIdAndUpdate(req.params.id, {totalRate:newAverage,generalSentiment:newAverageSentiment} ).then(function(product) {
               if (!product) {
                 return res.status(404).send()
               }

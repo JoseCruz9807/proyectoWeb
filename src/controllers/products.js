@@ -60,7 +60,7 @@ const updateProduct = function(req, res) {
       error: 'Invalid update, only allowed to update: ' + allowedUpdates
     })
   }
-  Product.findOneAndUpdate(_id, req.body ).then(function(product) {
+  Product.findByIdAndUpdate(_id, req.body ).then(function(product) {
     if (!product) {
       return res.status(404).send()
     }

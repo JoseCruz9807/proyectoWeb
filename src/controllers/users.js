@@ -1,5 +1,5 @@
 const User = require('../models/user')
-const bcrypt = require('bcryptjs')
+//const bcrypt = require('bcryptjs')
 // ya no debería tener esta ruta a menos que sea un usuario tipo admin
 const getUsers = function(req, res) {
   User.find({}).then(function(users) {
@@ -82,7 +82,7 @@ const updateUser = function(req, res) {
   // revisa que los updates enviados sean permitidos, que no envie una key que no permitimos
   const isValidUpdate = updates.every((update) => allowedUpdates.includes(update))
   const hasPassword=updates.every((update) => passKey.includes(update))
-  if(hasPassword){
+  /*if(hasPassword){
     bcrypt.hash(req.body.password, 8).then(function(hash){
       req.body.password = hash
 
@@ -91,7 +91,7 @@ const updateUser = function(req, res) {
           error: 'Invalid update, only allowed to update: ' + allowedUpdates
         })
       }
-      User.findByIdAndUpdate(_id, req.body ).then(function(user) {
+      User.findOneAndUpdate(_id, req.body ).then(function(user) {
         if (!user) {
           return res.status(404).send()
         }
@@ -104,13 +104,13 @@ const updateUser = function(req, res) {
       return res.status(500).send(error)
     })
   }
-  else{
+  else{*/
     if( !isValidUpdate ) {
       return res.status(400).send({
         error: 'Invalid update, only allowed to update: ' + allowedUpdates
       })
     }
-    User.findByIdAndUpdate(_id, req.body ).then(function(user) {
+    User.findOneAndUpdate(_id, req.body ).then(function(user) {
       if (!user) {
         return res.status(404).send()
       }
@@ -118,7 +118,7 @@ const updateUser = function(req, res) {
     }).catch(function(error) {
       res.status(500).send(error)
     })
-  }
+ // }
 }
 
 // este solo lo utilizarían si quisieran eliminar una cuenta, cancelar subscripcion, etc
